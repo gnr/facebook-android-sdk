@@ -56,7 +56,7 @@ public class FbDialog extends Dialog {
     private String mUrl;
     private DialogListener mListener;
     private ProgressDialog mSpinner;
-    private WebView mWebView;
+    private FacebookWebView mWebView;
     private LinearLayout mContent;
     private TextView mTitle;
 
@@ -122,7 +122,7 @@ public class FbDialog extends Dialog {
     }
 
     private void setUpWebView() {
-        mWebView = new WebView(getContext());
+        mWebView = new FacebookWebView(getContext());
         mWebView.setVerticalScrollBarEnabled(false);
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setWebViewClient(new FbDialog.FbWebViewClient());
