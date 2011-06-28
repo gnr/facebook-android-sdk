@@ -77,7 +77,11 @@ public class FbDialog extends Dialog {
         	public void onCancel (DialogInterface dialogInterface) {
         		mWebView.stopLoading();
         		mListener.onCancel();
-        		FbDialog.this.dismiss();
+        		try {
+        		    FbDialog.this.dismiss();
+                } catch(IllegalArgumentException iae) {
+                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
+                }        		    
         	}
         });
         
@@ -154,11 +158,19 @@ public class FbDialog extends Dialog {
                     mListener.onFacebookError(new FacebookError(error));
                 }
 
-                FbDialog.this.dismiss();
+                try {
+                    FbDialog.this.dismiss();
+                } catch(IllegalArgumentException iae) {
+                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
+                }
                 return true;
             } else if (url.startsWith(Facebook.CANCEL_URI)) {
                 mListener.onCancel();
-                FbDialog.this.dismiss();
+                try {
+                    FbDialog.this.dismiss();
+                } catch(IllegalArgumentException iae) {
+                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
+                }                
                 return true;
             } else if (url.contains(DISPLAY_STRING)) {
                 return false;
@@ -175,7 +187,11 @@ public class FbDialog extends Dialog {
             super.onReceivedError(view, errorCode, description, failingUrl);
             mListener.onError(
                     new DialogError(description, errorCode, failingUrl));
-            FbDialog.this.dismiss();
+            try {
+                FbDialog.this.dismiss();
+            } catch(IllegalArgumentException iae) {
+                // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
+            }
         }
 
         @Override
@@ -192,7 +208,11 @@ public class FbDialog extends Dialog {
             if (title != null && title.length() > 0) {
                 mTitle.setText(title);
             }
-            mSpinner.dismiss();
+            try {
+                mSpinner.dismiss();
+            } catch(IllegalArgumentException iae) {
+                // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
+            }
         }
 
     }
