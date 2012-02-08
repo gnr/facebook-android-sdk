@@ -60,7 +60,7 @@ public class Facebook {
     public static final String LOGIN_URI = "facebook.com/login.php";
 
     public static final String ERROR_CODE_KEY = "error_code";
-    public static final int LOGIN_REDIRECT_CODE = 3336;
+    public static final int LOGIN_REDIRECT_CODE = 6436;
 
     public static final String TOKEN = "access_token";
     public static final String EXPIRES = "expires_in";
