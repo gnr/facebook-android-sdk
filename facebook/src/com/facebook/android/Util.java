@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.CookieManager;
@@ -47,10 +48,15 @@ import android.webkit.CookieSyncManager;
  */
 public final class Util {
 
-    /**
+	private static final String TAG = "Facebook-Utils";
+
+	private static final String SHARED_PREFS_NAME = "facebook_shared_prefs";
+	private static final String SSO_ENABLED_PREFS_KEY = "sso_enabled_key";
+
+	/**
      * Generate the multi-part post body providing the parameters and boundary
      * string
-     * 
+     *
      * @param parameters the parameters need to be posted
      * @param boundary the random string as boundary
      * @return a string of the post body
@@ -121,7 +127,7 @@ public final class Util {
         }
     }
 
-    
+
     /**
      * Connect to an HTTP URL and return the response as a string.
      *
@@ -302,5 +308,18 @@ public final class Util {
         alertBuilder.setMessage(text);
         alertBuilder.create().show();
     }
+
+	public static void setSsoEnabled(Context context, boolean singleSignOnEnabled) {
+		Log.v(TAG, "Writing SSO enabled: " + String.valueOf(singleSignOnEnabled));
+		Editor ed = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).edit();
+		ed.putBoolean(SSO_ENABLED_PREFS_KEY, singleSignOnEnabled);
+		ed.commit();
+	}
+
+	public static boolean getSsoEnabled(Context context) {
+		final boolean rtn = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).getBoolean(SSO_ENABLED_PREFS_KEY, false);
+		Log.v(TAG, "Read SSO enabled: %s" + String.valueOf(rtn));
+		return rtn;
+	}
 
 }

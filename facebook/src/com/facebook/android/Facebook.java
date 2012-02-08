@@ -57,6 +57,11 @@ public class Facebook {
     // Strings used in the authorization flow
     public static final String REDIRECT_URI = "fbconnect://success";
     public static final String CANCEL_URI = "fbconnect://cancel";
+    public static final String LOGIN_URI = "facebook.com/login.php";
+
+    public static final String ERROR_CODE_KEY = "error_code";
+    public static final int LOGIN_REDIRECT_CODE = 3336;
+
     public static final String TOKEN = "access_token";
     public static final String EXPIRES = "expires_in";
     public static final String SINGLE_SIGN_ON_DISABLED = "service_disabled";
@@ -85,7 +90,7 @@ public class Facebook {
     private String[] mAuthPermissions;
     private int mAuthActivityCode;
     private DialogListener mAuthDialogListener;
-    
+
     // If the last time we extended the access token was more than 24 hours ago
     // we try to refresh the access token again.
     final private long REFRESH_TOKEN_BARRIER = 24L * 60L * 60L * 1000L;
@@ -202,6 +207,9 @@ public class Facebook {
             singleSignOnStarted = startSingleSignOn(activity, mAppId,
                     permissions, activityCode);
         }
+
+        Util.setSsoEnabled(activity, singleSignOnStarted);
+
         // Otherwise fall back to traditional dialog.
         if (!singleSignOnStarted) {
             startDialogAuth(activity, permissions);
@@ -245,6 +253,7 @@ public class Facebook {
         mAuthPermissions = permissions;
         mAuthActivityCode = activityCode;
         try {
+        	Log.d("Facebook-authorize", "Starting SSO activity for result");
             activity.startActivityForResult(intent, activityCode);
         } catch (ActivityNotFoundException e) {
             didSucceed = false;
@@ -308,7 +317,8 @@ public class Facebook {
         CookieSyncManager.createInstance(activity);
         dialog(activity, LOGIN, params, new DialogListener() {
 
-            public void onComplete(Bundle values) {
+            @Override
+			public void onComplete(Bundle values) {
                 // ensure any cookies set by the dialog are saved
                 CookieSyncManager.getInstance().sync();
                 setAccessToken(values.getString(TOKEN));
@@ -324,17 +334,20 @@ public class Facebook {
                 }
             }
 
-            public void onError(DialogError error) {
+            @Override
+			public void onError(DialogError error) {
                 Log.d("Facebook-authorize", "Login failed: " + error);
                 mAuthDialogListener.onError(error);
             }
 
-            public void onFacebookError(FacebookError error) {
+            @Override
+			public void onFacebookError(FacebookError error) {
                 Log.d("Facebook-authorize", "Login failed: " + error);
                 mAuthDialogListener.onFacebookError(error);
             }
 
-            public void onCancel() {
+            @Override
+			public void onCancel() {
                 Log.d("Facebook-authorize", "Login canceled");
                 mAuthDialogListener.onCancel();
             }
@@ -433,7 +446,7 @@ public class Facebook {
      * will automatically replace the old token with a new one. Note that this
      * method is asynchronous and the callback will be invoked in the original
      * calling thread (not in a background thread).
-     * 
+     *
      * @param context
      *            The Android Context that will be used to bind to the Facebook
      *            RefreshToken Service
@@ -461,30 +474,32 @@ public class Facebook {
                 new TokenRefreshServiceConnection(context, serviceListener),
                 Context.BIND_AUTO_CREATE);
     }
-    
+
     /**
     * Calls extendAccessToken if shouldExtendAccessToken returns true.
-    * 
+    *
     * @return the same value as extendAccessToken if the the token requires
     *           refreshing, true otherwise
     */
     public boolean extendAccessTokenIfNeeded(Context context, ServiceListener serviceListener) {
         if (shouldExtendAccessToken()) {
+            Log.v("Facebook-authorize", "Extending access token");
             return extendAccessToken(context, serviceListener);
         }
+        Log.v("Facebook-authorize", "Access token extension not required");
         return true;
     }
-    
+
     /**
-     * Check if the access token requires refreshing. 
-     * 
+     * Check if the access token requires refreshing.
+     *
      * @return true if the last time a new token was obtained was over 24 hours ago.
      */
     public boolean shouldExtendAccessToken() {
         return isSessionValid() &&
                 (System.currentTimeMillis() - mLastAccessUpdate >= REFRESH_TOKEN_BARRIER);
     }
-    
+
     /**
      * Handles connection to the token refresh service (this service is a part
      * of Facebook App).
@@ -565,8 +580,8 @@ public class Facebook {
                 serviceListener.onError(new Error("Service connection error"));
             }
         }
-    };    
-    
+    };
+
     /**
      * Invalidate the current user session by removing the access token in
      * memory, clearing the browser cookie, and calling auth.expireSession
@@ -895,7 +910,7 @@ public class Facebook {
         public void onCancel();
 
     }
-    
+
     /**
      * Callback interface for service requests.
      */
@@ -903,7 +918,7 @@ public class Facebook {
 
         /**
          * Called when a service request completes.
-         * 
+         *
          * @param values
          *            Key-value string pairs extracted from the response.
          */

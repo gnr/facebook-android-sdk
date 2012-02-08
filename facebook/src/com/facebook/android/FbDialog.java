@@ -192,6 +192,18 @@ public class FbDialog extends Dialog {
                     // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
                 }
                 return true;
+            } else if (Util.getSsoEnabled(getContext()) && url.contains(Facebook.LOGIN_URI)) {
+            	Log.d("Facebook-WebView", "Facebook tried to redirect to login URI - bailing");
+
+            	Bundle values = new Bundle();
+            	values.putInt(Facebook.ERROR_CODE_KEY, Facebook.LOGIN_REDIRECT_CODE);
+                mListener.onComplete(values);
+                try {
+                    FbDialog.this.dismiss();
+                } catch(IllegalArgumentException iae) {
+                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
+                }
+                return true;
             } else if (url.contains(DISPLAY_STRING)) {
                 return false;
             }
@@ -216,7 +228,7 @@ public class FbDialog extends Dialog {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            Log.d("Facebook-WebView", "Webview loading URL: " + url);
+        	Log.d("Facebook-WebView", "Webview loading URL: " + url);
             super.onPageStarted(view, url, favicon);
             createProgressDialog().show();
         }
