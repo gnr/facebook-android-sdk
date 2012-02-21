@@ -105,7 +105,7 @@ public class FbDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 mListener.onCancel();
-                FbDialog.this.dismiss();
+                safeDismissDialog(FbDialog.this);
             }
         });
         Drawable crossDrawable = getContext().getResources().getDrawable(R.drawable.close);
@@ -117,9 +117,7 @@ public class FbDialog extends Dialog {
     }
 
     private ProgressDialog createProgressDialog() {
-    	if (mSpinner != null) {
-    		mSpinner.dismiss();
-    	}
+    	safeDismissDialog(mSpinner);
 
         mSpinner = new ProgressDialog(getContext());
         mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -129,11 +127,7 @@ public class FbDialog extends Dialog {
         	public void onCancel (DialogInterface dialogInterface) {
         		mWebView.stopLoading();
         		mListener.onCancel();
-        		try {
-        		    FbDialog.this.dismiss();
-                } catch(IllegalArgumentException iae) {
-                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
-                }
+        		safeDismissDialog(FbDialog.this);
         	}
         });
 
@@ -178,19 +172,11 @@ public class FbDialog extends Dialog {
                     mListener.onFacebookError(new FacebookError(error));
                 }
 
-                try {
-                    FbDialog.this.dismiss();
-                } catch(IllegalArgumentException iae) {
-                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
-                }
+                safeDismissDialog(FbDialog.this);
                 return true;
             } else if (url.startsWith(Facebook.CANCEL_URI)) {
                 mListener.onCancel();
-                try {
-                    FbDialog.this.dismiss();
-                } catch(IllegalArgumentException iae) {
-                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
-                }
+                safeDismissDialog(FbDialog.this);
                 return true;
             } else if (Util.getSsoEnabled(getContext()) && url.contains(Facebook.LOGIN_URI)) {
             	Log.d("Facebook-WebView", "Facebook tried to redirect to login URI - bailing");
@@ -198,11 +184,7 @@ public class FbDialog extends Dialog {
             	Bundle values = new Bundle();
             	values.putInt(Facebook.ERROR_CODE_KEY, Facebook.LOGIN_REDIRECT_CODE);
                 mListener.onComplete(values);
-                try {
-                    FbDialog.this.dismiss();
-                } catch(IllegalArgumentException iae) {
-                    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
-                }
+                safeDismissDialog(FbDialog.this);
                 return true;
             } else if (url.contains(DISPLAY_STRING)) {
                 return false;
@@ -217,13 +199,8 @@ public class FbDialog extends Dialog {
         public void onReceivedError(WebView view, int errorCode,
                 String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            mListener.onError(
-                    new DialogError(description, errorCode, failingUrl));
-            try {
-                FbDialog.this.dismiss();
-            } catch(IllegalArgumentException iae) {
-                // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
-            }
+            mListener.onError(new DialogError(description, errorCode, failingUrl));
+            safeDismissDialog(FbDialog.this);
         }
 
         @Override
@@ -236,13 +213,7 @@ public class FbDialog extends Dialog {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-			try {
-			    if (mSpinner != null) {
-			    	mSpinner.dismiss();
-			    }
-			} catch(IllegalArgumentException iae) {
-			    // swallow - thrown if the user slides the keyboard in/out while fb dialog is loading
-			}
+            safeDismissDialog(mSpinner);
 
 			/*
              * Once webview is fully loaded, set the mContent background to be transparent
@@ -251,6 +222,20 @@ public class FbDialog extends Dialog {
             mContent.setBackgroundColor(Color.TRANSPARENT);
             mWebView.setVisibility(View.VISIBLE);
             mCrossImage.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public static void safeDismissDialog(Dialog dialog) {
+        try {
+        	if (dialog != null) {
+        		dialog.dismiss();
+        	}
+        }
+        catch(NullPointerException e) {
+            Log.d("Facebook-WebView", "NPE dismissing dialog");
+        }
+        catch(IllegalArgumentException iae) {
+            Log.d("Facebook-WebView", "IAE dismissing dialog");
         }
     }
 }
