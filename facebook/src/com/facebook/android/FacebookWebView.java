@@ -11,6 +11,7 @@ public class FacebookWebView extends WebView {
     
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+        // workaround for crash seen in android market
         try {
             super.onWindowFocusChanged(hasFocus);
         } catch (NullPointerException npe) {

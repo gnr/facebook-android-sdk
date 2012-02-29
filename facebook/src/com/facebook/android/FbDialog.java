@@ -136,7 +136,7 @@ public class FbDialog extends Dialog {
 
     private void setUpWebView(int margin) {
         LinearLayout webViewContainer = new LinearLayout(getContext());
-        mWebView = new WebView(getContext());
+        mWebView = new FacebookWebView(getContext());
         mWebView.setVerticalScrollBarEnabled(false);
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setWebViewClient(new FbDialog.FbWebViewClient());
@@ -178,7 +178,7 @@ public class FbDialog extends Dialog {
                 mListener.onCancel();
                 safeDismissDialog(FbDialog.this);
                 return true;
-            } else if (Util.getSsoEnabled(getContext()) && url.contains(Facebook.LOGIN_URI)) {
+            } else if (Util.getSsoEnabled(getContext()) && (url.contains(Facebook.LOGIN_URI) || url.contains(Facebook.HOME_URI))) {
             	Log.d("Facebook-WebView", "Facebook tried to redirect to login URI - bailing");
 
             	Bundle values = new Bundle();
@@ -207,7 +207,17 @@ public class FbDialog extends Dialog {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             Util.logd("Facebook-WebView", "Webview loading URL: " + url);
             super.onPageStarted(view, url, favicon);
-            createProgressDialog().show();
+            
+            if (Util.getSsoEnabled(getContext()) && (url.contains(Facebook.LOGIN_URI) || url.contains(Facebook.HOME_URI))) {
+                Log.d("Facebook-WebView", "Facebook loaded login or home URI - bailing");
+    
+                Bundle values = new Bundle();
+                values.putInt(Facebook.ERROR_CODE_KEY, Facebook.LOGIN_REDIRECT_CODE);
+                mListener.onComplete(values);
+                safeDismissDialog(FbDialog.this);
+            } else {
+                createProgressDialog().show();
+            }
         }
 
         @Override

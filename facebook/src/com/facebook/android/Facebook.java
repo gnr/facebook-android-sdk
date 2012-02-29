@@ -57,6 +57,7 @@ public class Facebook {
     public static final String REDIRECT_URI = "fbconnect://success";
     public static final String CANCEL_URI = "fbconnect://cancel";
     public static final String LOGIN_URI = "facebook.com/login.php";
+    public static final String HOME_URI = "facebook.com/home.php";
 
     public static final String ERROR_CODE_KEY = "error_code";
     public static final int LOGIN_REDIRECT_CODE = 6436;
