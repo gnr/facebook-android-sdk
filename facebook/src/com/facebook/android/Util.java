@@ -341,4 +341,8 @@ public final class Util {
             Log.d(tag, msg);
         }
     }
+    
+    public static void toggleLoggingEnabled(boolean enabled) {
+        ENABLE_LOG = enabled;
+    }
 }

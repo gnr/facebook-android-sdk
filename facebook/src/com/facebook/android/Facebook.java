@@ -252,7 +252,7 @@ public class Facebook {
         mAuthPermissions = permissions;
         mAuthActivityCode = activityCode;
         try {
-        	Log.d("Facebook-authorize", "Starting SSO activity for result");
+        	Util.logd("Facebook-authorize", "Starting SSO activity for result");
             activity.startActivityForResult(intent, activityCode);
         } catch (ActivityNotFoundException e) {
             didSucceed = false;
@@ -517,10 +517,10 @@ public class Facebook {
     */
     public boolean extendAccessTokenIfNeeded(Context context, ServiceListener serviceListener) {
         if (shouldExtendAccessToken()) {
-            Log.v("Facebook-authorize", "Extending access token");
+            Util.logd("Facebook-authorize", "Extending access token");
             return extendAccessToken(context, serviceListener);
         }
-        Log.v("Facebook-authorize", "Access token extension not required");
+        Util.logd("Facebook-authorize", "Access token extension not required");
         return true;
     }
 
