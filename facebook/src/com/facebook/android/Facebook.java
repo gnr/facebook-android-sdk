@@ -39,7 +39,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.CookieSyncManager;
 
 /**
@@ -245,7 +244,7 @@ public class Facebook {
         // Verify that the application whose package name is
         // com.facebook.katana.ProxyAuth
         // has the expected FB app signature.
-        if (!validateAppSignatureForIntent(activity, intent)) {
+        if (!validateActivityIntent(activity, intent)) {
             return false;
         }
 
@@ -263,24 +262,59 @@ public class Facebook {
     }
 
     /**
-     * Query the signature for the application that would be invoked by the
-     * given intent and verify that it matches the FB application's signature.
+     * Helper to validate an activity intent by resolving and checking the
+     * provider's package signature.
      *
      * @param context
      * @param intent
-     * @param validSignature
-     * @return true if the app's signature matches the expected signature.
+     * @return true if the service intent resolution happens successfully and the
+     * 	signatures match.
      */
-    private boolean validateAppSignatureForIntent(Context context,
-            Intent intent) {
-
+    private boolean validateActivityIntent(Context context, Intent intent) {
         ResolveInfo resolveInfo =
-                context.getPackageManager().resolveActivity(intent, 0);
+            context.getPackageManager().resolveActivity(intent, 0);
         if (resolveInfo == null) {
             return false;
         }
 
-        String packageName = resolveInfo.activityInfo.packageName;
+        return validateAppSignatureForPackage(
+            context,
+            resolveInfo.activityInfo.packageName);
+    }
+
+
+    /**
+     * Helper to validate a service intent by resolving and checking the
+     * provider's package signature.
+     *
+     * @param context
+     * @param intent
+     * @return true if the service intent resolution happens successfully and the
+     * 	signatures match.
+     */
+    private boolean validateServiceIntent(Context context, Intent intent) {
+        ResolveInfo resolveInfo =
+            context.getPackageManager().resolveService(intent, 0);
+        if (resolveInfo == null) {
+            return false;
+        }
+
+        return validateAppSignatureForPackage(
+            context,
+            resolveInfo.serviceInfo.packageName);
+    }
+
+    /**
+     * Query the signature for the application that would be invoked by the
+     * given intent and verify that it matches the FB application's signature.
+     *
+     * @param context
+     * @param packageName
+     * @return true if the app's signature matches the expected signature.
+     */
+    private boolean validateAppSignatureForPackage(Context context,
+        String packageName) {
+
         PackageInfo packageInfo;
         try {
             packageInfo = context.getPackageManager().getPackageInfo(
@@ -324,7 +358,7 @@ public class Facebook {
                 setAccessToken(values.getString(TOKEN));
                 setAccessExpiresIn(values.getString(EXPIRES));
                 if (isSessionValid()) {
-                    Log.d("Facebook-authorize", "Login Success! access_token="
+                    Util.logd("Facebook-authorize", "Login Success! access_token="
                             + getAccessToken() + " expires="
                             + getAccessExpires());
                     mAuthDialogListener.onComplete(values);
@@ -335,20 +369,20 @@ public class Facebook {
             }
 
             @Override
-			public void onError(DialogError error) {
-                Log.d("Facebook-authorize", "Login failed: " + error);
+            public void onError(DialogError error) {
+                Util.logd("Facebook-authorize", "Login failed: " + error);
                 mAuthDialogListener.onError(error);
             }
 
             @Override
-			public void onFacebookError(FacebookError error) {
-                Log.d("Facebook-authorize", "Login failed: " + error);
+            public void onFacebookError(FacebookError error) {
+                Util.logd("Facebook-authorize", "Login failed: " + error);
                 mAuthDialogListener.onFacebookError(error);
             }
 
             @Override
-			public void onCancel() {
-                Log.d("Facebook-authorize", "Login canceled");
+            public void onCancel() {
+                Util.logd("Facebook-authorize", "Login canceled");
                 mAuthDialogListener.onCancel();
             }
         });
@@ -383,19 +417,19 @@ public class Facebook {
                 if (error != null) {
                     if (error.equals(SINGLE_SIGN_ON_DISABLED)
                             || error.equals("AndroidAuthKillSwitchException")) {
-                        Log.d("Facebook-authorize", "Hosted auth currently "
+                        Util.logd("Facebook-authorize", "Hosted auth currently "
                             + "disabled. Retrying dialog auth...");
                         startDialogAuth(mAuthActivity, mAuthPermissions);
                     } else if (error.equals("access_denied")
                             || error.equals("OAuthAccessDeniedException")) {
-                        Log.d("Facebook-authorize", "Login canceled by user.");
+                        Util.logd("Facebook-authorize", "Login canceled by user.");
                         mAuthDialogListener.onCancel();
                     } else {
                         String description = data.getStringExtra("error_description");
                         if (description != null) {
                             error = error + ":" + description;
                         }
-                    	Log.d("Facebook-authorize", "Login failed: " + error);
+                        Util.logd("Facebook-authorize", "Login failed: " + error);
                         mAuthDialogListener.onFacebookError(
                           new FacebookError(error));
                     }
@@ -405,7 +439,7 @@ public class Facebook {
                     setAccessToken(data.getStringExtra(TOKEN));
                     setAccessExpiresIn(data.getStringExtra(EXPIRES));
                     if (isSessionValid()) {
-                        Log.d("Facebook-authorize",
+                        Util.logd("Facebook-authorize",
                                 "Login Success! access_token="
                                         + getAccessToken() + " expires="
                                         + getAccessExpires());
@@ -421,7 +455,7 @@ public class Facebook {
 
                 // An Android error occured.
                 if (data != null) {
-                    Log.d("Facebook-authorize",
+                    Util.logd("Facebook-authorize",
                             "Login failed: " + data.getStringExtra("error"));
                     mAuthDialogListener.onError(
                             new DialogError(
@@ -431,7 +465,7 @@ public class Facebook {
 
                 // User pressed the 'back' button.
                 } else {
-                    Log.d("Facebook-authorize", "Login canceled by user.");
+                    Util.logd("Facebook-authorize", "Login canceled by user.");
                     mAuthDialogListener.onCancel();
                 }
             }
@@ -466,7 +500,7 @@ public class Facebook {
         // Verify that the application whose package name is
         // com.facebook.katana
         // has the expected FB app signature.
-        if (!validateAppSignatureForIntent(context, intent)) {
+        if (!validateServiceIntent(context, intent)) {
             return false;
         }
 

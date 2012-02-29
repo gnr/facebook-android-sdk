@@ -48,12 +48,18 @@ import android.webkit.CookieSyncManager;
  */
 public final class Util {
 
-	private static final String TAG = "Facebook-Utils";
+    private static final String TAG = "Facebook-Utils";
 
-	private static final String SHARED_PREFS_NAME = "facebook_shared_prefs";
-	private static final String SSO_ENABLED_PREFS_KEY = "sso_enabled_key";
+    private static final String SHARED_PREFS_NAME = "facebook_shared_prefs";
+    private static final String SSO_ENABLED_PREFS_KEY = "sso_enabled_key";
 
-	/**
+    /**
+     * Set this to true to enable log output.  Remember to turn this back off
+     * before releasing.  Sending sensitive data to log is a security risk.
+     */
+    private static boolean ENABLE_LOG = false;
+
+    /**
      * Generate the multi-part post body providing the parameters and boundary
      * string
      *
@@ -152,7 +158,7 @@ public final class Util {
         if (method.equals("GET")) {
             url = url + "?" + encodeUrl(params);
         }
-        Log.d("Facebook-Util", method + " URL: " + url);
+        Util.logd("Facebook-Util", method + " URL: " + url);
         HttpURLConnection conn =
             (HttpURLConnection) new URL(url).openConnection();
         // GJV set connect & read timeouts to prevent infinite waiting
@@ -309,17 +315,30 @@ public final class Util {
         alertBuilder.create().show();
     }
 
-	public static void setSsoEnabled(Context context, boolean singleSignOnEnabled) {
-		Log.v(TAG, "Writing SSO enabled: " + String.valueOf(singleSignOnEnabled));
-		Editor ed = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).edit();
-		ed.putBoolean(SSO_ENABLED_PREFS_KEY, singleSignOnEnabled);
-		ed.commit();
-	}
+    public static void setSsoEnabled(Context context, boolean singleSignOnEnabled) {
+        Util.logd(TAG, "Writing SSO enabled: " + String.valueOf(singleSignOnEnabled));
+        Editor ed = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).edit();
+        ed.putBoolean(SSO_ENABLED_PREFS_KEY, singleSignOnEnabled);
+        ed.commit();
+    }
 
-	public static boolean getSsoEnabled(Context context) {
-		final boolean rtn = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).getBoolean(SSO_ENABLED_PREFS_KEY, false);
-		Log.v(TAG, "Read SSO enabled: %s" + String.valueOf(rtn));
-		return rtn;
-	}
+    public static boolean getSsoEnabled(Context context) {
+        final boolean rtn = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).getBoolean(SSO_ENABLED_PREFS_KEY, false);
+        Util.logd(TAG, "Read SSO enabled: " + String.valueOf(rtn));
+        return rtn;
+    }
 
+    /**
+     * A proxy for Log.d api that kills log messages in release build. It
+     * not recommended to send sensitive information to log output in
+     * shipping apps.
+     *
+     * @param tag
+     * @param msg
+     */
+    public static void logd(String tag, String msg) {
+        if (ENABLE_LOG) {
+            Log.d(tag, msg);
+        }
+    }
 }
