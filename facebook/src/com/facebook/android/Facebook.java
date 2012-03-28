@@ -403,8 +403,9 @@ public class Facebook {
      *   Activity.html#onActivityResult(int, int, android.content.Intent)
      */
     public void authorizeCallback(int requestCode, int resultCode, Intent data) {
-        if (requestCode == mAuthActivityCode) {
+    	Util.logd("Facebook", String.format("authorizing callback: %d / %d", requestCode, mAuthActivityCode));
 
+    	if (requestCode == mAuthActivityCode) {
             // Successfully redirected.
             if (resultCode == Activity.RESULT_OK) {
 
@@ -598,7 +599,7 @@ public class Facebook {
             serviceListener.onError(new Error("Service disconnected"));
             // We returned an error so there's no point in
             // keeping the binding open.
-            mAuthActivity.unbindService(TokenRefreshServiceConnection.this);
+            applicationsContext.unbindService(TokenRefreshServiceConnection.this);
         }
 
         private void refreshToken() {
