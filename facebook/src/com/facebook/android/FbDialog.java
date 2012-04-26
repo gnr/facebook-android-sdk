@@ -119,7 +119,7 @@ public class FbDialog extends Dialog {
     private ProgressDialog createProgressDialog() {
     	safeDismissDialog(mSpinner);
 
-        mSpinner = new ProgressDialog(getContext());
+    	mSpinner = new ProgressDialog(getContext());
         mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mSpinner.setMessage("Loading...");
         mSpinner.setOnCancelListener(new OnCancelListener() {
@@ -207,16 +207,21 @@ public class FbDialog extends Dialog {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             Util.logd("Facebook-WebView", "Webview loading URL: " + url);
             super.onPageStarted(view, url, favicon);
-            
+
             if (Util.getSsoEnabled(getContext()) && (url.contains(Facebook.LOGIN_URI) || url.contains(Facebook.HOME_URI))) {
                 Log.d("Facebook-WebView", "Facebook loaded login or home URI - bailing");
-    
+
                 Bundle values = new Bundle();
                 values.putInt(Facebook.ERROR_CODE_KEY, Facebook.LOGIN_REDIRECT_CODE);
                 mListener.onComplete(values);
                 safeDismissDialog(FbDialog.this);
-            } else {
-                createProgressDialog().show();
+            }
+            else {
+                Log.d("Facebook-WebView", "Trying to show progress dialog...");
+            	if (FbDialog.this.isShowing()) {
+                    Log.d("Facebook-WebView", "Showing progress dialog...");
+            		createProgressDialog().show();
+            	}
             }
         }
 
