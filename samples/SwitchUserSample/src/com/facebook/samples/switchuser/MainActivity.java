@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,10 @@ public class MainActivity extends FragmentActivity {
         if (currentSession != null) {
             currentSession.addCallback(sessionStatusCallback);
         }
+
+        // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.  Do so in
+        // the onResume methods of the primary Activities that an app may be launched into.
+        AppEventsLogger.activateApp(this);
     }
 
     @Override

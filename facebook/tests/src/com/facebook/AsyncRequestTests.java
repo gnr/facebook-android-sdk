@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,6 +186,7 @@ public class AsyncRequestTests extends FacebookTestCase {
 
     @MediumTest
     @LargeTest
+    @SuppressWarnings("deprecation")
     public void testStaticExecuteMeAsync() {
         final TestSession session = openTestSessionWithSharedUser();
 
@@ -210,6 +211,7 @@ public class AsyncRequestTests extends FacebookTestCase {
 
     @MediumTest
     @LargeTest
+    @SuppressWarnings("deprecation")
     public void testStaticExecuteMyFriendsAsync() {
         final TestSession session = openTestSessionWithSharedUser();
 

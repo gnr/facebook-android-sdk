@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,10 @@
 
 package com.facebook;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.ConditionVariable;
 import android.os.Looper;
 import com.facebook.internal.Utility;
-import com.facebook.model.GraphMultiResult;
-import com.facebook.model.GraphObject;
-import com.facebook.model.GraphObjectList;
-import com.facebook.model.GraphUser;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -266,51 +259,4 @@ public class SessionTestsBase extends FacebookTestCase {
         }
     }
 
-    static class WaitForBroadcastReceiver extends BroadcastReceiver {
-        static int idGenerator = 0;
-        final int id = idGenerator++;
-
-        ConditionVariable condition = new ConditionVariable(true);
-        int expectCount;
-        int actualCount;
-
-        public void incrementExpectCount() {
-            incrementExpectCount(1);
-        }
-
-        public void incrementExpectCount(int n) {
-            expectCount += n;
-            if (actualCount < expectCount) {
-                condition.close();
-            }
-        }
-
-        public void waitForExpectedCalls() {
-            if (!condition.block(DEFAULT_TIMEOUT_MILLISECONDS)) {
-                assertTrue(false);
-            }
-        }
-
-        public static void incrementExpectCounts(WaitForBroadcastReceiver... receivers) {
-            for (WaitForBroadcastReceiver receiver : receivers) {
-                receiver.incrementExpectCount();
-            }
-        }
-
-        public static void waitForExpectedCalls(WaitForBroadcastReceiver... receivers) {
-            for (WaitForBroadcastReceiver receiver : receivers) {
-                receiver.waitForExpectedCalls();
-            }
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (++actualCount == expectCount) {
-                condition.open();
-            }
-            assertTrue(actualCount <= expectCount);
-            assertEquals("BroadcastReceiver should receive on main UI thread",
-                    Thread.currentThread(), Looper.getMainLooper().getThread());
-        }
-    }
 }

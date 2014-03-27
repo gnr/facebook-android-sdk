@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,17 @@
 
 package com.facebook.samples.friendpicker;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.widget.Toast;
 import com.facebook.FacebookException;
+import com.facebook.model.GraphUser;
 import com.facebook.widget.FriendPickerFragment;
 import com.facebook.widget.PickerFragment;
+
+import java.util.List;
 
 // This class provides an example of an Activity that uses FriendPickerFragment to display a list of
 // the user's friends. It takes a programmatic approach to creating the FriendPickerFragment with the
@@ -84,17 +87,20 @@ public class PickFriendsActivity extends FragmentActivity {
     }
 
     private void onError(Exception error) {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.error_dialog_title)
-                .setMessage(error.getMessage())
-                .setPositiveButton(R.string.ok_button, null)
-                .show();
+        String text = getString(R.string.exception, error.getMessage());
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         try {
+            FriendPickerApplication application = (FriendPickerApplication) getApplication();
+            List<GraphUser> selectedUsers = application.getSelectedUsers();
+            if (selectedUsers != null && !selectedUsers.isEmpty()) {
+                friendPickerFragment.setSelection(selectedUsers);
+            }
             // Load data, unless a query has already taken place.
             friendPickerFragment.loadData(false);
         } catch (Exception ex) {
