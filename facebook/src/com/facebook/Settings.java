@@ -517,24 +517,4 @@ public final class Settings {
     public static void setOnProgressThreshold(long threshold) {
         onProgressThreshold.set(threshold);
     }
-
-    /**
-     * Gets the current version of the Facebook SDK for Android as a string.
-     *
-     * @return the current version of the SDK
-     */
-    public static String getSdkVersion() {
-        return FacebookSdkVersion.BUILD;
-    }
-
-    /**
-     * Gets the current Facebook migration bundle string; this string can be passed to Graph API
-     * endpoints to specify a set of platform migrations that are explicitly turned on or off for
-     * that call, in order to ensure compatibility between a given version of the SDK and the
-     * Graph API.
-     * @return the migration bundle supported by this version of the SDK
-     */
-    public static String getMigrationBundle() {
-        return FacebookSdkVersion.MIGRATION_BUNDLE;
-    }
 }
