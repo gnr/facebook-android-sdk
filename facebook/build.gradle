@@ -5,16 +5,16 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:22.2.1'
     compile 'com.parse.bolts:bolts-android:1.1.4'
 }
 
 android {
-    compileSdkVersion 10
+    compileSdkVersion 22
     buildToolsVersion "22.0.1"
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 10
+        targetSdkVersion 22
     }
 
     lintOptions {
