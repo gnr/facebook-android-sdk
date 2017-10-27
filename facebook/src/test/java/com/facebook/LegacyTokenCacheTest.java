@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 
 import java.lang.reflect.Array;
@@ -71,7 +70,7 @@ public final class LegacyTokenCacheTest extends FacebookPowerMockTestCase {
     @Override
     public void setUp() {
         super.setUp();
-
+        FacebookSdk.setApplicationId("123456789");
         FacebookSdk.sdkInitialize(RuntimeEnvironment.application);
     }
 

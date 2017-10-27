@@ -1,4 +1,6 @@
 // Facebook SDK
+include ':facebook-core'
+include ':facebook-common', ':facebook-login', ':facebook-share', ':facebook-places', ':facebook-applinks', ':facebook-messenger'
 include ':facebook'
 
 // Samples
@@ -7,6 +9,7 @@ include ':samples:Iconicus'
 include ':samples:LoginSample'
 include ':samples:RPSSample'
 include ':samples:MessengerSendSample'
+include ':samples:PlacesGraphSample'
 include ':samples:Scrumptious'
 include ':samples:SwitchUserSample'
 include ':samples:ShareIt'
