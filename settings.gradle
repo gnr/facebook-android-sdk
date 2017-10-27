@@ -1,27 +1,23 @@
 // Facebook SDK
+include ':facebook-core'
+include ':facebook-common', ':facebook-login', ':facebook-share', ':facebook-places', ':facebook-applinks', ':facebook-messenger'
 include ':facebook'
 
-// Tests
-include 'TestApp'
-project(':TestApp').projectDir = new File('facebook/TestApp')
-include 'tests'
-project(':tests').projectDir = new File('facebook/tests')
-
 // Samples
-include 'FriendPickerSample'
-project(':FriendPickerSample').projectDir = new File('samples/FriendPickerSample')
-include 'HelloFacebookSample'
-project(':HelloFacebookSample').projectDir = new File('samples/HelloFacebookSample')
-include 'PlacePickerSample'
-project(':PlacePickerSample').projectDir = new File('samples/PlacePickerSample')
-include 'RPSSample'
-project(':RPSSample').projectDir = new File('samples/RPSSample')
-include 'Scrumptious'
-project(':Scrumptious').projectDir = new File('samples/Scrumptious')
-include 'SwitchUserSample'
-project(':SwitchUserSample').projectDir = new File('samples/SwitchUserSample')
+include ':samples:HelloFacebookSample'
+include ':samples:Iconicus'
+include ':samples:LoginSample'
+include ':samples:RPSSample'
+include ':samples:MessengerSendSample'
+include ':samples:PlacesGraphSample'
+include ':samples:Scrumptious'
+include ':samples:SwitchUserSample'
+include ':samples:ShareIt'
 
 if (file('internal/internal-settings.gradle').exists()) {
-  apply from: 'internal/internal-settings.gradle'
+    apply from: 'internal/internal-settings.gradle'
 }
 
+if (file('local.gradle').exists()) {
+    apply from: 'local.gradle'
+}

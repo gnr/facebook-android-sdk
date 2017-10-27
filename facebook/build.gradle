@@ -1,49 +1,60 @@
 apply plugin: 'com.android.library'
 
-repositories {
-  mavenCentral()
-  maven { url 'https://maven.google.com' }
-}
+project.group 'com.facebook.android'
+
+project.ext.name = 'Facebook-Android-SDK'
+project.ext.artifactId = "facebook-android-sdk"
+project.ext.description = 'Facebook Android SDK'
+project.ext.url = 'https://github.com/facebook/facebook-android-sdk'
 
 dependencies {
-    compile 'com.android.support:support-v4:27.0.0'
-    compile 'com.parse.bolts:bolts-android:1.4.0'
+    // Facebook Dependencies
+    compile project(':facebook-core')
+    compile project(':facebook-common')
+    compile project(':facebook-login')
+    compile project(":facebook-share")
+    compile project(":facebook-places")
+    compile project(":facebook-applinks")
+    compile project(":facebook-messenger")
+
+    // Unit Tests
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:3.3'
+
+    def powerMockVersion = '1.6.1'
+    testCompile "org.powermock:powermock-api-mockito:$powerMockVersion"
+    testCompile "org.powermock:powermock-module-junit4:$powerMockVersion"
+    testCompile "org.powermock:powermock-module-junit4-rule:$powerMockVersion"
+    testCompile "org.powermock:powermock-classloading-xstream:$powerMockVersion"
+
+    // Connected Tests
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 26
+        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        consumerProguardFiles 'proguard-project.txt'
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
     }
 
     lintOptions {
         abortOnError false
     }
 
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-        }
-
-        // Move the tests to tests/java, tests/res, etc...
-        instrumentTest.setRoot('tests')
-
-        // Move the build types to build-types/<type>
-        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
-        // This moves them out of them default location under src/<type>/... which would
-        // conflict with src/ being used by the main source set.
-        // Adding new build types or product flavors should be accompanied
-        // by a similar customization.
-        debug.setRoot('build-types/debug')
-        release.setRoot('build-types/release')
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     buildTypes {
@@ -52,3 +63,5 @@ android {
         release {}
     }
 }
+
+apply from: "${rootDir}/maven.gradle"
