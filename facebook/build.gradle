@@ -6,13 +6,13 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:26.0.0'
-    compile 'com.parse.bolts:bolts-android:1.1.4'
+    compile 'com.android.support:support-v4:27.0.0'
+    compile 'com.parse.bolts:bolts-android:1.4.0'
 }
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.2"
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
@@ -44,5 +44,11 @@ android {
         // by a similar customization.
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
+    }
+
+    buildTypes {
+        debug {}
+        debugProguard {}
+        release {}
     }
 }
